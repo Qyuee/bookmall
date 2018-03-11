@@ -1,0 +1,199 @@
+-- 장바구니
+ALTER TABLE `cart`
+	DROP FOREIGN KEY `FK_member_TO_cart`; -- 회원 -> 장바구니
+
+-- 장바구니
+ALTER TABLE `cart`
+	DROP FOREIGN KEY `FK_book_TO_cart`; -- 도서 -> 장바구니
+
+-- 도서
+ALTER TABLE `book`
+	DROP FOREIGN KEY `FK_category_TO_book`; -- 카테고리 -> 도서
+
+-- 주문
+ALTER TABLE `order`
+	DROP FOREIGN KEY `FK_member_TO_order`; -- 회원 -> 주문
+
+-- 주문도서
+ALTER TABLE `order_book`
+	DROP FOREIGN KEY `FK_book_TO_order_book`; -- 도서 -> 주문도서
+
+-- 주문도서
+ALTER TABLE `order_book`
+	DROP FOREIGN KEY `FK_order_TO_order_book`; -- 주문 -> 주문도서
+
+-- 장바구니
+DROP TABLE IF EXISTS `cart` RESTRICT;
+
+-- 회원
+DROP TABLE IF EXISTS `member` RESTRICT;
+
+-- 카테고리
+DROP TABLE IF EXISTS `category` RESTRICT;
+
+-- 도서
+DROP TABLE IF EXISTS `book` RESTRICT;
+
+-- 주문
+DROP TABLE IF EXISTS `order` RESTRICT;
+
+-- 주문도서
+DROP TABLE IF EXISTS `order_book` RESTRICT;
+
+-- 장바구니
+CREATE TABLE `cart` (
+	`cartno` VARCHAR(50) NOT NULL COMMENT '번호', -- 번호
+	`qty`    INTEGER     NULL     COMMENT '수량', -- 수량
+	`price`  INTEGER     NULL     COMMENT '가격', -- 가격
+	`memno`  INTEGER     NOT NULL COMMENT '회원번호', -- 회원번호
+	`bookno` INTEGER     NOT NULL COMMENT '도서번호' -- 도서번호
+)
+COMMENT '장바구니';
+
+-- 장바구니
+ALTER TABLE `cart`
+	ADD CONSTRAINT `PK_cart` -- 장바구니 기본키
+		PRIMARY KEY (
+			`cartno` -- 번호
+		);
+
+-- 회원
+CREATE TABLE `member` (
+	`memno`    INTEGER      NOT NULL COMMENT '번호', -- 번호
+	`name`     VARCHAR(20)  NOT NULL COMMENT '이름', -- 이름
+	`tel`      VARCHAR(20)  NULL     COMMENT '전화번호', -- 전화번호
+	`email`    VARCHAR(30)  NOT NULL COMMENT '이메일', -- 이메일
+	`password` VARCHAR(100) NOT NULL COMMENT '비밀번호' -- 비밀번호
+)
+COMMENT '회원';
+
+-- 회원
+ALTER TABLE `member`
+	ADD CONSTRAINT `PK_member` -- 회원 기본키
+		PRIMARY KEY (
+			`memno` -- 번호
+		);
+
+ALTER TABLE `member`
+	MODIFY COLUMN `memno` INTEGER NOT NULL AUTO_INCREMENT COMMENT '번호';
+
+-- 카테고리
+CREATE TABLE `category` (
+	`cateno` INTEGER     NOT NULL COMMENT '번호', -- 번호
+	`name`   VARCHAR(50) NOT NULL COMMENT '이름' -- 이름
+)
+COMMENT '카테고리';
+
+-- 카테고리
+ALTER TABLE `category`
+	ADD CONSTRAINT `PK_category` -- 카테고리 기본키
+		PRIMARY KEY (
+			`cateno` -- 번호
+		);
+
+ALTER TABLE `category`
+	MODIFY COLUMN `cateno` INTEGER NOT NULL AUTO_INCREMENT COMMENT '번호';
+
+-- 도서
+CREATE TABLE `book` (
+	`bookno` INTEGER      NOT NULL COMMENT '번호', -- 번호
+	`title`  VARCHAR(100) NOT NULL COMMENT '제목', -- 제목
+	`price`  INTEGER      NOT NULL COMMENT '가격', -- 가격
+	`cateno` INTEGER      NOT NULL COMMENT '카테고리번호' -- 카테고리번호
+)
+COMMENT '도서';
+
+-- 도서
+ALTER TABLE `book`
+	ADD CONSTRAINT `PK_book` -- 도서 기본키
+		PRIMARY KEY (
+			`bookno` -- 번호
+		);
+
+ALTER TABLE `book`
+	MODIFY COLUMN `bookno` INTEGER NOT NULL AUTO_INCREMENT COMMENT '번호';
+
+-- 주문
+CREATE TABLE `order` (
+	`orderno` VARCHAR(50)  NOT NULL COMMENT '번호', -- 번호
+	`price`   INTEGER      NULL     COMMENT '결제금액', -- 결제금액
+	`addr`    VARCHAR(100) NULL     COMMENT '배송지', -- 배송지
+	`memno`   INTEGER      NULL     COMMENT '고객번호' -- 고객번호
+)
+COMMENT '주문';
+
+-- 주문
+ALTER TABLE `order`
+	ADD CONSTRAINT `PK_order` -- 주문 기본키
+		PRIMARY KEY (
+			`orderno` -- 번호
+		);
+
+-- 주문도서
+CREATE TABLE `order_book` (
+	`bookno`  INTEGER     NULL     COMMENT '도서번호', -- 도서번호
+	`orderno` VARCHAR(50) NULL     COMMENT '주문번호', -- 주문번호
+	`qty`     INTEGER     NOT NULL COMMENT '수량', -- 수량
+	`price`   INTEGER     NOT NULL COMMENT '가격' -- 가격
+)
+COMMENT '주문도서';
+
+-- 장바구니
+ALTER TABLE `cart`
+	ADD CONSTRAINT `FK_member_TO_cart` -- 회원 -> 장바구니
+		FOREIGN KEY (
+			`memno` -- 회원번호
+		)
+		REFERENCES `member` ( -- 회원
+			`memno` -- 번호
+		);
+
+-- 장바구니
+ALTER TABLE `cart`
+	ADD CONSTRAINT `FK_book_TO_cart` -- 도서 -> 장바구니
+		FOREIGN KEY (
+			`bookno` -- 도서번호
+		)
+		REFERENCES `book` ( -- 도서
+			`bookno` -- 번호
+		);
+
+-- 도서
+ALTER TABLE `book`
+	ADD CONSTRAINT `FK_category_TO_book` -- 카테고리 -> 도서
+		FOREIGN KEY (
+			`cateno` -- 카테고리번호
+		)
+		REFERENCES `category` ( -- 카테고리
+			`cateno` -- 번호
+		);
+
+-- 주문
+ALTER TABLE `order`
+	ADD CONSTRAINT `FK_member_TO_order` -- 회원 -> 주문
+		FOREIGN KEY (
+			`memno` -- 고객번호
+		)
+		REFERENCES `member` ( -- 회원
+			`memno` -- 번호
+		);
+
+-- 주문도서
+ALTER TABLE `order_book`
+	ADD CONSTRAINT `FK_book_TO_order_book` -- 도서 -> 주문도서
+		FOREIGN KEY (
+			`bookno` -- 도서번호
+		)
+		REFERENCES `book` ( -- 도서
+			`bookno` -- 번호
+		);
+
+-- 주문도서
+ALTER TABLE `order_book`
+	ADD CONSTRAINT `FK_order_TO_order_book` -- 주문 -> 주문도서
+		FOREIGN KEY (
+			`orderno` -- 주문번호
+		)
+		REFERENCES `order` ( -- 주문
+			`orderno` -- 번호
+		);
